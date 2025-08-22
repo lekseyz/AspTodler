@@ -34,4 +34,20 @@ public class AuthController : ControllerBase
         var user = new UserDto("69", "mail@mail.mail");
         return CreatedAtRoute("GetUser",new {userId = user.Id}, new UserTokenDto("token", "koken-huyoken"));
     }
+
+    [HttpPost("get_token")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public ActionResult<AccessTokenDto> GetToken([FromBody] string refreshToken)
+    {
+        if (refreshToken == "koken-huyoken")
+        {
+            return Ok(new AccessTokenDto("token"));
+        }
+        
+        return Unauthorized(Problem(
+            title: "Invalid refresh token",
+            statusCode: StatusCodes.Status401Unauthorized,
+            detail: "Refresh token expired"));
+    }
 }
