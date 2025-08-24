@@ -1,0 +1,36 @@
+# -----------------------------
+# .NET / ASP.NET build artifacts
+# -----------------------------
+bin/
+obj/
+out/
+Debug/
+Release/
+*.exe
+*.dll
+*.pdb
+*.cache
+*.log
+*.user
+*.suo
+
+# Coverage / test
+*.coverage
+*.coveragexml
+coverage/
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+
+# -----------------------------
+# Rider / JetBrains IDE
+# -----------------------------
+.idea/
+*.sln.iml
+
+# Rider caches
+*.iws
+*.ipr
