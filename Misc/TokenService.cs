@@ -1,9 +1,9 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Domain.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Misc.Contracts;
 using Misc.Options;
 
 namespace Misc;
@@ -17,9 +17,9 @@ public class TokenService
         _options = options.Value;
     }
     
-    public string GenerateToken(GenerateTokenRequest request)
+    public string GenerateToken(UserModel user)
     {
-        Claim[] claims = [new("userId", request.UserEmail), new("email",  request.UserEmail)];
+        Claim[] claims = [new("id", user.Id.ToString()), new("email",  user.Email)];
         
         var signingCredentials = new SigningCredentials(
             key: new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.SecretKey)),
@@ -34,7 +34,7 @@ public class TokenService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public string GenerateRefreshToken()
+    public RefreshToken GenerateRefreshToken()
     {
         string tokenChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         Random random = new Random();
@@ -46,6 +46,6 @@ public class TokenService
             refreshToken[i] = tokenChars[random.Next(tokenChars.Length)];
         }
         
-        return new string(refreshToken);
+        return new RefreshToken(){Token = new string(refreshToken),  Expires = DateTime.UtcNow.AddDays(_options.RefreshLifetimeDays)};
     }
 }

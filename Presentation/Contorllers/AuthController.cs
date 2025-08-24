@@ -1,5 +1,6 @@
 using Application.User.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Misc;
 using Presentation.Dtos;
 
 namespace Presentation.Contorllers;
@@ -24,7 +25,13 @@ public class AuthController : ControllerBase
     {
         _logger.LogInformation($"Login {authUser}");
         var authResult = _userService.LoginUser(authUser.Email, authUser.Password).Result;
-        return Ok(new UserTokensResponse(authResult.Token, authResult.RefreshToken));
+        
+        if (authResult.IsFailure)
+            return authResult.GetError.GetObjectResult();
+        
+        var auth = authResult.Value;
+        
+        return Ok(new UserTokensResponse(auth!.Token, auth.RefreshToken));
     }
 
     [HttpPost("register")]
@@ -35,19 +42,25 @@ public class AuthController : ControllerBase
     {
         _logger.LogInformation($"Register {authUser}");
         var authResult = _userService.RegisterUser(authUser.Email, authUser.Password).Result;
-        return CreatedAtRoute("GetUser",new {userId = authResult.User.Id}, new UserTokensResponse(authResult.Token, authResult.RefreshToken));
+        
+        if (authResult.IsFailure)
+            return authResult.GetError.GetObjectResult();
+        
+        var auth = authResult.Value;
+        
+        return CreatedAtRoute("GetUser",new {userId = auth!.User.Id}, new UserTokensResponse(auth.Token, auth.RefreshToken));
     }
 
-    [HttpPost("get_token")]
+    [HttpPost("refresh")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public ActionResult<AccessTokenResponse> GetToken([FromBody] string refreshToken)
+    public async Task<ActionResult<UserTokensResponse>> RefreshToken([FromQuery] Guid id, [FromBody] string refreshToken)
     {
-        return Ok(new AccessTokenResponse(refreshToken));
-        
-        return Unauthorized(Problem(
-            title: "Invalid refresh token",
-            statusCode: StatusCodes.Status401Unauthorized,
-            detail: "Refresh token expired"));
+        var authResult = await _userService.RefreshToken(id, refreshToken);
+        if (authResult.IsFailure)
+            return authResult.GetError.GetObjectResult();
+
+        var auth = authResult.Value;
+        return Ok(new UserTokensResponse(auth!.Token, auth.RefreshToken));
     }
 }

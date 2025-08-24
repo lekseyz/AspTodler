@@ -1,6 +1,6 @@
 namespace Infrastructure.DbEntities;
 
-public class User
+public class UserEntity
 {
     public int Id { get; set; }
     public Guid Guid { get; set; }

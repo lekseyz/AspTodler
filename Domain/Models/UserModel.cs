@@ -8,7 +8,7 @@ public class UserModel
     public string PasswordSalt { get; private set; }
     public string RefreshToken { get; private set; }
 
-    public UserModel(Guid id, string email, string passwordHash, string passwordSalt, string refreshToken)
+    public UserModel(Guid id, string email, string passwordHash, string passwordSalt, string refreshToken = "")
     {
         Id = id;
         Email = email;

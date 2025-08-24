@@ -16,3 +16,5 @@
 /home/lekseysz/projs/csharp/AspTodler/Application/obj/Debug/net9.0/refint/Application.dll
 /home/lekseysz/projs/csharp/AspTodler/Application/obj/Debug/net9.0/Application.pdb
 /home/lekseysz/projs/csharp/AspTodler/Application/obj/Debug/net9.0/ref/Application.dll
+/home/lekseysz/projs/csharp/AspTodler/Application/bin/Debug/net9.0/Infrastructure.dll
+/home/lekseysz/projs/csharp/AspTodler/Application/bin/Debug/net9.0/Infrastructure.pdb

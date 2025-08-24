@@ -11,3 +11,6 @@
 /home/lekseysz/projs/csharp/AspTodler/Misc/obj/Debug/net9.0/refint/Misc.dll
 /home/lekseysz/projs/csharp/AspTodler/Misc/obj/Debug/net9.0/Misc.pdb
 /home/lekseysz/projs/csharp/AspTodler/Misc/obj/Debug/net9.0/ref/Misc.dll
+/home/lekseysz/projs/csharp/AspTodler/Misc/bin/Debug/net9.0/Domain.dll
+/home/lekseysz/projs/csharp/AspTodler/Misc/bin/Debug/net9.0/Domain.pdb
+/home/lekseysz/projs/csharp/AspTodler/Misc/obj/Debug/net9.0/Misc.csproj.Up2Date

@@ -1,10 +1,21 @@
+using Infrastructure.Configurations;
 using Infrastructure.DbEntities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Contexts;
+namespace Infrastructure;
 
 public class TodlerDbContext : DbContext
 {
-    DbSet<RefreshToken> RefreshTokens { get; set; }
-    DbSet<User> Users { get; set; }
+    public TodlerDbContext(DbContextOptions<TodlerDbContext> options) : base(options) {}
+
+    public DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
+    public DbSet<UserEntity> Users { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
+        modelBuilder.ApplyConfiguration(new UserConfiguration());
+        
+        base.OnModelCreating(modelBuilder);
+    }
 }

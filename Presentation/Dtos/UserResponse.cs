@@ -1,3 +1,3 @@
 namespace Presentation.Dtos;
 
-public record UserResponse(string Id, string Email);
+public record UserResponse(Guid Id, string Email);

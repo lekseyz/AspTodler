@@ -1,3 +1,5 @@
+using Application.User.Interfaces;
+using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Dtos;
@@ -9,27 +11,36 @@ namespace Presentation.Contorllers;
 public class UserController : ControllerBase
 {
     ILogger<UserController> _logger;
-
-    public UserController(ILogger<UserController> logger)
+    IUserService _userService;
+    UserRepository _userRepository;
+    public UserController(ILogger<UserController> logger, IUserService userService, UserRepository userRepository)
     {
         _logger = logger;
+        _userService = userService;
+        _userRepository = userRepository;
     }
 
     [HttpGet]
-    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public ActionResult<List<UserResponse>> GetUsers()
+    public async Task<ActionResult<List<UserResponse>>> GetUsers()
     {
         _logger.LogInformation("GetUsers");
-        return new List<UserResponse>() { new UserResponse("1488", "some@email.com"), new UserResponse("1499", "some.other@email.com") };
+        var users = await _userService.GetAll();
+        List<UserResponse> userResponses = users.Select(u => new UserResponse(u.Id, u.Email)).ToList();
+        return userResponses;
     }
 
     [HttpGet("{userId}", Name = "GetUser")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<UserResponse> GetUser([FromRoute] string userId)
+    public async Task<ActionResult<UserResponse>> GetUser([FromRoute] Guid userId)
     {
-        _logger.LogInformation($"GetUser {userId}");
-        return new UserResponse(userId, "mail.mail.mail.mail.mail.mail.mail.mail.mail.mail.mail@mail.mail");
+        var userResult = await _userService.Get(userId);
+
+        if (userResult.IsFailure)
+            return userResult.GetError.GetObjectResult();
+        
+        var user = userResult.Value;
+        return Ok(user);
     }
 }
