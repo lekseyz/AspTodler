@@ -1,6 +1,6 @@
-using Application.User.Interfaces;
+using Application.Common.ErrorTypes;
+using Application.UserLogic.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Misc;
 using Presentation.Dtos;
 
 namespace Presentation.Contorllers;
@@ -27,7 +27,16 @@ public class AuthController : ControllerBase
         var authResult = _userService.LoginUser(authUser.Email, authUser.Password).Result;
         
         if (authResult.IsFailure)
-            return authResult.GetError.GetObjectResult();
+        {
+            var error = authResult.GetError;
+            return error switch
+            {
+                AuthError authError => Unauthorized(authError.Message),
+                { } baseError       => Problem(statusCode: StatusCodes.Status500InternalServerError, 
+                                                title: "User login error", 
+                                                detail: baseError.Message)
+            };
+        }
         
         var auth = authResult.Value;
         
@@ -44,7 +53,16 @@ public class AuthController : ControllerBase
         var authResult = _userService.RegisterUser(authUser.Email, authUser.Password).Result;
         
         if (authResult.IsFailure)
-            return authResult.GetError.GetObjectResult();
+        {
+            var error = authResult.GetError;
+            return error switch
+            {
+                InputError inputError => Conflict(inputError.Message),
+                { } baseError         => Problem(statusCode: StatusCodes.Status500InternalServerError, 
+                                            title: "User login error",
+                                            detail: baseError.Message)
+            };
+        }
         
         var auth = authResult.Value;
         
@@ -58,8 +76,18 @@ public class AuthController : ControllerBase
     {
         var authResult = await _userService.RefreshToken(id, refreshToken);
         if (authResult.IsFailure)
-            return authResult.GetError.GetObjectResult();
-
+        {
+            var error = authResult.GetError;
+            return error switch
+            {
+                AuthError authError         => Unauthorized(authError.Message),
+                NotFoundError notFoundError => Unauthorized(notFoundError.Message),
+                { } baseError               => Problem(statusCode: StatusCodes.Status500InternalServerError,
+                                                    title: "Refresh token error",
+                                                    detail: baseError.Message)
+            };
+        }
+        
         var auth = authResult.Value;
         return Ok(new UserTokensResponse(auth!.Token, auth.RefreshToken));
     }

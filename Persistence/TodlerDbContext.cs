@@ -1,8 +1,8 @@
-using Infrastructure.Configurations;
-using Infrastructure.DbEntities;
+using Persistence.Configurations;
+using Persistence.DbEntities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure;
+namespace Persistence;
 
 public class TodlerDbContext : DbContext
 {
