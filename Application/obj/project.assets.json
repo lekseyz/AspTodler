@@ -439,9 +439,8 @@
         "framework": ".NETCoreApp,Version=v9.0",
         "dependencies": {
           "Domain": "1.0.0",
-          "Microsoft.EntityFrameworkCore": "9.0.8",
-          "Misc": "1.0.0",
-          "Npgsql.EntityFrameworkCore.PostgreSQL": "9.0.4"
+          "Microsoft.AspNetCore.Authentication.JwtBearer": "9.0.8",
+          "Microsoft.AspNetCore.Cryptography.KeyDerivation": "9.0.8"
         },
         "compile": {
           "bin/placeholder/Infrastructure.dll": {}
@@ -450,19 +449,20 @@
           "bin/placeholder/Infrastructure.dll": {}
         }
       },
-      "Misc/1.0.0": {
+      "Persistence/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
         "dependencies": {
           "Domain": "1.0.0",
-          "Microsoft.AspNetCore.Authentication.JwtBearer": "9.0.8",
-          "Microsoft.AspNetCore.Cryptography.KeyDerivation": "9.0.8"
+          "Infrastructure": "1.0.0",
+          "Microsoft.EntityFrameworkCore": "9.0.8",
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "9.0.4"
         },
         "compile": {
-          "bin/placeholder/Misc.dll": {}
+          "bin/placeholder/Persistence.dll": {}
         },
         "runtime": {
-          "bin/placeholder/Misc.dll": {}
+          "bin/placeholder/Persistence.dll": {}
         }
       }
     }
@@ -1103,17 +1103,17 @@
       "path": "../Infrastructure/Infrastructure.csproj",
       "msbuildProject": "../Infrastructure/Infrastructure.csproj"
     },
-    "Misc/1.0.0": {
+    "Persistence/1.0.0": {
       "type": "project",
-      "path": "../Misc/Misc.csproj",
-      "msbuildProject": "../Misc/Misc.csproj"
+      "path": "../Persistence/Persistence.csproj",
+      "msbuildProject": "../Persistence/Persistence.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net9.0": [
       "Domain >= 1.0.0",
       "Infrastructure >= 1.0.0",
-      "Misc >= 1.0.0"
+      "Persistence >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -1147,8 +1147,8 @@
             "/home/lekseysz/projs/csharp/AspTodler/Infrastructure/Infrastructure.csproj": {
               "projectPath": "/home/lekseysz/projs/csharp/AspTodler/Infrastructure/Infrastructure.csproj"
             },
-            "/home/lekseysz/projs/csharp/AspTodler/Misc/Misc.csproj": {
-              "projectPath": "/home/lekseysz/projs/csharp/AspTodler/Misc/Misc.csproj"
+            "/home/lekseysz/projs/csharp/AspTodler/Persistence/Persistence.csproj": {
+              "projectPath": "/home/lekseysz/projs/csharp/AspTodler/Persistence/Persistence.csproj"
             }
           }
         }
@@ -1187,13 +1187,5 @@
         "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/9.0.303/PortableRuntimeIdentifierGraph.json"
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1900",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Error occurred while getting package vulnerability data: Unable to load the service index for source https://api.nuget.org/v3/index.json."
-    }
-  ]
+  }
 }

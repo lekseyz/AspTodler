@@ -1,10 +1,13 @@
-using Application.User.Contracts;
-using Application.User.Interfaces;
+using Application.UserLogic.Contracts;
+using Application.UserLogic.Interfaces;
+using Application.Common.ErrorTypes;
+using Application.Common;
 using Domain.Models;
-using Infrastructure.Repositories;
-using Misc;
+using Domain.ValueTypes;
+using Persistence.Repositories;
+using Infrastructure;
 
-namespace Application.User.Services;
+namespace Application.UserLogic.Services;
 
 public class UserService : IUserService
 {
@@ -21,31 +24,29 @@ public class UserService : IUserService
         _refreshTokenRepository = refreshTokenRepository;
     }
 
-    public async Task<List<UserModel>> GetAll() //TODO: pagination
+    public async Task<List<User>> GetUsers() //TODO: pagination
     {
-        var users = await _userRepository.GetAll();
-        return users.Select(u => new UserModel(u.Guid, u.Email, u.PasswordHash, u.PasswordSalt)).ToList();
+        return await _userRepository.GetAll();
     }
 
-    public async Task<ResultOptional<UserModel>> Get(Guid id)
+    public async Task<ResultOptional<User>> Get(Guid id)
     {
-        var userResult = await _userRepository.GetById(id);
+        var user = await _userRepository.GetById(id);
+        if  (user == null)
+            return ResultOptional<User>.Failure(new NotFoundError($"User with id {id} not found."));
         
-        if (userResult.IsFailure)
-            return  ResultOptional<UserModel>.Failure(userResult.GetError);
-        
-        var user = userResult.Value;
-        return ResultOptional<UserModel>.Success(user!);
+        return ResultOptional<User>.Success(user!);
     }
     
     public async Task<ResultOptional<AuthResult>> RegisterUser(string email, string password)
     {   
         if (await _userRepository.IsEmailPresent(email)) 
-            return ResultOptional<AuthResult>.Failure(Error.WrongValue($"Email {email} is already in use.")); 
+            return ResultOptional<AuthResult>.Failure(new InputError($"Email {email} already exists.")); 
         
         var (hash, salt) = _passwordService.HashPassword(password);
+        var pass = new Password(hash, salt);
         var refreshToken = _tokenService.GenerateRefreshToken();
-        var newUser = new UserModel(Guid.NewGuid(), email, hash, salt);
+        var newUser = User.Construct(Guid.NewGuid(), email, pass);
         
         var jwtToken = _tokenService.GenerateToken(newUser);
         
@@ -58,14 +59,14 @@ public class UserService : IUserService
 
     public async Task<ResultOptional<AuthResult>> LoginUser(string email, string password)
     {
-        var userResult = await _userRepository.GetByEmail(email);
+        var user= await _userRepository.GetByEmail(email);
         
-        if (userResult.IsFailure)
-            return ResultOptional<AuthResult>.Failure(Error.AuthError("Wrong email or password."));
-        var user =  userResult.Value;
-        
-        if (!_passwordService.VerifyPassword(user!.PasswordHash, password, user.PasswordSalt)) 
-            return ResultOptional<AuthResult>.Failure(Error.AuthError("Wrong email or password.")); 
+        if (user is null)
+            return ResultOptional<AuthResult>.Failure(new AuthError("Cannot login error"));
+
+        var pass = user.Password;
+        if (!_passwordService.VerifyPassword(pass.Hash, password, pass.Salt)) 
+            return ResultOptional<AuthResult>.Failure(new AuthError("Cannot login error")); 
         
         var refreshToken = _tokenService.GenerateRefreshToken();
         var jwtToken = _tokenService.GenerateToken(user);
@@ -78,20 +79,17 @@ public class UserService : IUserService
 
     public async Task<ResultOptional<AuthResult>> RefreshToken(Guid userId, string refreshToken)
     {
+        var user = await _userRepository.GetById(userId);
+        if (user is null)
+            return ResultOptional<AuthResult>.Failure(new NotFoundError($"User {userId} not found"));
+        
         if (!await _refreshTokenRepository.Check(userId, refreshToken))
-            return ResultOptional<AuthResult>.Failure(Error.AuthError("Wrong refresh token."));
+            return ResultOptional<AuthResult>.Failure(new AuthError("Refresh token is invalid"));
 
-        var userResult = await _userRepository.GetById(userId);
-        if (userResult.IsFailure)
-            return ResultOptional<AuthResult>.Failure(userResult.GetError);
-
-        var user = userResult.Value;
         var newToken = _tokenService.GenerateRefreshToken();
         var jwtToken = _tokenService.GenerateToken(user!);
-        var refreshTokenResult = await _refreshTokenRepository.Update(userId, refreshToken, newToken);
+        await _refreshTokenRepository.Update(userId, refreshToken, newToken);
         
-        if (refreshTokenResult.IsFailure)
-            return ResultOptional<AuthResult>.Failure(refreshTokenResult.GetError);
         return ResultOptional<AuthResult>.Success(new AuthResult(user!, jwtToken, newToken.Token));
     }
 }

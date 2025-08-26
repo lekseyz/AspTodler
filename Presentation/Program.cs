@@ -1,13 +1,7 @@
-using System.Text;
-using Application.User.Interfaces;
-using Application.User.Services;
+using Application.UserLogic.Interfaces;
+using Application.UserLogic.Services;
 using Infrastructure;
-using Infrastructure.Repositories;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Misc;
-using Misc.Options;
+using Persistence.Repositories;
 using Presentation.Extensions;
 using Scalar.AspNetCore;
 

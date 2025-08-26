@@ -1,7 +1,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Misc.Options;
+using Infrastructure.Options;
 
 namespace Presentation.Extensions;
 

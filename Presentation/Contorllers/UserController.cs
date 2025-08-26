@@ -1,5 +1,5 @@
-using Application.User.Interfaces;
-using Infrastructure.Repositories;
+using Application.Common.ErrorTypes;
+using Application.UserLogic.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Dtos;
@@ -12,12 +12,10 @@ public class UserController : ControllerBase
 {
     ILogger<UserController> _logger;
     IUserService _userService;
-    UserRepository _userRepository;
-    public UserController(ILogger<UserController> logger, IUserService userService, UserRepository userRepository)
+    public UserController(ILogger<UserController> logger, IUserService userService)
     {
         _logger = logger;
         _userService = userService;
-        _userRepository = userRepository;
     }
 
     [HttpGet]
@@ -25,7 +23,7 @@ public class UserController : ControllerBase
     public async Task<ActionResult<List<UserResponse>>> GetUsers()
     {
         _logger.LogInformation("GetUsers");
-        var users = await _userService.GetAll();
+        var users = await _userService.GetUsers();
         List<UserResponse> userResponses = users.Select(u => new UserResponse(u.Id, u.Email)).ToList();
         return userResponses;
     }
@@ -38,7 +36,16 @@ public class UserController : ControllerBase
         var userResult = await _userService.Get(userId);
 
         if (userResult.IsFailure)
-            return userResult.GetError.GetObjectResult();
+        {
+            var error = userResult.GetError;
+            return error switch
+            {
+                NotFoundError notFoundError => NotFound(notFoundError.Message),
+                {} baseError                => Problem(statusCode: StatusCodes.Status500InternalServerError,
+                                                    title: "Get user error",
+                                                    detail: baseError.Message)   
+            };
+        }
         
         var user = userResult.Value;
         return Ok(user);

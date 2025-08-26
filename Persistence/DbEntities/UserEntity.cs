@@ -1,9 +1,8 @@
-namespace Infrastructure.DbEntities;
+namespace Persistence.DbEntities;
 
 public class UserEntity
 {
-    public int Id { get; set; }
-    public Guid Guid { get; set; }
+    public Guid Id { get; set; }
     public string Email { get; set; }
     public string PasswordHash { get; set; }
     public string PasswordSalt { get; set; }
