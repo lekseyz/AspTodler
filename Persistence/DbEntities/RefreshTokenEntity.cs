@@ -13,6 +13,7 @@ public class RefreshTokenEntity
     public bool IsActive { get; set; } = true;
     public int? NextTokenId { get; set; } = null;
     public RefreshTokenEntity? NextToken { get; set; } = null;
+    public RefreshTokenEntity? PreviousToken { get; set; } = null;
 
     public static RefreshTokenEntity Create(UserEntity user, RefreshToken token)
     {

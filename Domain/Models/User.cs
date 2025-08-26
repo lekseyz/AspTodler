@@ -15,6 +15,10 @@ public class User
         Password = password;
     }
 
+    public static User Create(string email, Password password)
+    {
+        return new User(Guid.NewGuid(), email, password);
+    }
     public static User Construct(Guid id, string email, Password password)
     {
         return new User(id, email, password);
