@@ -1,3 +1,4 @@
+using Domain.Models;
 using Persistence.Configurations;
 using Persistence.DbEntities;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,8 @@ public class TodlerDbContext : DbContext
 
     public DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
     public DbSet<UserEntity> Users { get; set; }
+    public DbSet<NoteInfoEntity> NoteInfos { get; set; }
+    public DbSet<NoteContentEntity> NoteContents { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -7,4 +7,5 @@ public class UserEntity
     public string PasswordHash { get; set; }
     public string PasswordSalt { get; set; }
     public List<RefreshTokenEntity> RefreshTokens { get; set; } = [];
+    public List<NoteInfoEntity> Notes { get; set; } = [];
 }

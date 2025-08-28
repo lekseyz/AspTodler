@@ -8,10 +8,10 @@ public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
 {
     public void Configure(EntityTypeBuilder<UserEntity> builder)
     {
-        builder.HasKey(x => x.Id);
+        builder.HasKey(u => u.Id);
         
-        builder.HasMany(x => x.RefreshTokens)
-            .WithOne(x => x.User)
-            .HasForeignKey(x => x.UserId);
+        builder.HasMany(u => u.RefreshTokens)
+            .WithOne(t => t.User)
+            .HasForeignKey(t => t.UserId);
     }
 }

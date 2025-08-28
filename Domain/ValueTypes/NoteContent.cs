@@ -2,9 +2,9 @@ namespace Domain.ValueTypes;
 
 public class NoteContent
 {
-    public required string Content { get; init; }
+    public string Content { get; private set; }
 
-    private NoteContent( string content)
+    public NoteContent( string content)
     {
         Content = content;
     }

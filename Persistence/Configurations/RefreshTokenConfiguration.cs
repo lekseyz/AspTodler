@@ -8,13 +8,14 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshTokenEn
 {
     public void Configure(EntityTypeBuilder<RefreshTokenEntity> builder)
     {
-        builder.HasKey(x => x.Id);
-        builder.Property(x => x.Id).ValueGeneratedOnAdd();
+        builder.HasKey(t => t.Id);
+        builder.Property(t => t.Id).ValueGeneratedOnAdd();
         
-        builder.HasOne(x => x.User)
-            .WithMany(x => x.RefreshTokens).
-            HasForeignKey(x => x.UserId);
-        builder.HasOne(x => x.NextToken)
+        builder.HasOne(t => t.User)
+            .WithMany(u => u.RefreshTokens).
+            HasForeignKey(t => t.UserId);
+        
+        builder.HasOne(t => t.NextToken)
             .WithOne(t => t.PreviousToken)
             .HasForeignKey<RefreshTokenEntity>(t => t.NextTokenId);
     }
