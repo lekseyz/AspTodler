@@ -40,9 +40,10 @@ public class NoteRepository
                 .Where(n => n.CreatorId == userId)
                 .Select(n => Note.ConstructInfo(n.Id, new NoteInfo(n.Title, n.CreatorId, n.Created, n.LastModified)))
                 .ToListAsync(),
-            Note.Types.Full => await JoinInfoAndContext(_context.NoteInfos.AsNoTracking(), _context.NoteContents.AsNoTracking())
-                .Where(infoAndContent =>  infoAndContent.NoteInfo.CreatorId == userId)
-                .Select(iac => Note.Construct(iac.NoteInfo.Id, MapInfo(iac.NoteInfo), MapContent(iac.NoteContent)))
+            Note.Types.Full => await _context.NoteInfos
+                .Include(n => n.Content)
+                .Where(info => info.CreatorId == userId)
+                .Select(info => Note.Construct(info.Id, MapInfo(info), MapContent(info.Content)))
                 .ToListAsync(),
             { } => throw new NotImplementedException()
         };
@@ -50,52 +51,46 @@ public class NoteRepository
 
     public async Task<Note?> GetNote(Guid id)
     {
-        var infoAndContent = await JoinInfoAndContext(_context.NoteInfos.AsNoTracking(), _context.NoteContents.AsNoTracking())
-            .FirstOrDefaultAsync(s => s.NoteInfo.Id == id);
-        if (infoAndContent is null)
+        var info = await _context.NoteInfos
+            .AsNoTracking()
+            .Include(n => n.Content)
+            .FirstOrDefaultAsync(s => s.Id == id);
+        if (info is null)
             return null;
         
-        var (info, content) = infoAndContent;
         
-        return Note.Construct(info.Id, MapInfo(info), MapContent(content));
+        return Note.Construct(info.Id, MapInfo(info), MapContent(info.Content));
     }
 
-    public async Task UpdateNote(Note note)
+    public async Task<bool> UpdateNote(Note note)
     {
-        var infoAndContent = await JoinInfoAndContext(_context.NoteInfos, _context.NoteContents)
-            .FirstOrDefaultAsync(s => s.NoteInfo.Id == note.Id);
-        
-        var (info, content) = infoAndContent!;
+        var info = await _context.NoteInfos
+            .Include(n => n.Content)
+            .FirstOrDefaultAsync(s => s.Id == note.Id);
+
+        if (info is null)
+            return false;
         
         info.Title = note.Info.Title;
         info.LastModified = note.Info.LastModified;
-        content.Content = note.Content.Content;
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task<bool> DeleteNote(Guid id)
-    {
-        var infoAndContent = await JoinInfoAndContext(_context.NoteInfos, _context.NoteContents)
-            .FirstOrDefaultAsync(s => s.NoteInfo.Id == id);
-        if (infoAndContent is null)
-            return false;
-        
-        var (info, content) = infoAndContent;
-        _context.NoteInfos.Remove(info);
-        _context.NoteContents.Remove(content);
-        
+        info.Content.Content = note.Content.Content;
         await _context.SaveChangesAsync();
         return true;
     }
 
-    private IQueryable<InfoAndContent> JoinInfoAndContext(IQueryable<NoteInfoEntity> noteInfos, IQueryable<NoteContentEntity> noteContents)
+    public async Task<bool> DeleteNote(Guid id)
     {
-        return noteInfos
-            .Join(noteContents, 
-                info => info.Id, 
-                content => content.Id, 
-                (info, content) => new InfoAndContent(info, content)
-                );
+        var info = await _context.NoteInfos
+            .Include(n => n.Content)
+            .FirstOrDefaultAsync(s => s.Id == id);
+        if (info is null)
+            return false;
+        
+        _context.NoteInfos.Remove(info);
+        _context.NoteContents.Remove(info.Content);
+        
+        await _context.SaveChangesAsync();
+        return true;
     }
 
     private NoteInfo MapInfo(NoteInfoEntity entity)

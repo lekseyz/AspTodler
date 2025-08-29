@@ -13,5 +13,9 @@ public class NoteInfoConfiguration : IEntityTypeConfiguration<NoteInfoEntity>
         builder.HasOne(n => n.Creator)
             .WithMany(u => u.Notes)
             .HasForeignKey(n => n.CreatorId);
+        
+        builder.HasOne(n => n.Content)
+            .WithOne(c => c.Info)
+            .HasForeignKey<NoteContentEntity>(content =>  content.Id);
     }
 }

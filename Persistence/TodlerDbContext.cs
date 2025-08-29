@@ -18,6 +18,8 @@ public class TodlerDbContext : DbContext
     {
         modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
         modelBuilder.ApplyConfiguration(new UserConfiguration());
+        modelBuilder.ApplyConfiguration(new NoteInfoConfiguration());
+        modelBuilder.ApplyConfiguration(new NoteContentConfiguration());
         
         base.OnModelCreating(modelBuilder);
     }

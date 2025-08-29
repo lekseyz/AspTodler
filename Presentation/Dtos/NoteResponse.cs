@@ -1,3 +1,3 @@
 namespace Presentation.Dtos;
 
-public record NoteResponse(string Title, DateTime Created, DateTime Modified);
+public record NoteResponse(Guid Id, string Title, DateTime Created, DateTime Modified);

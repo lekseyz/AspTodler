@@ -5,7 +5,6 @@ using Application.NoteLogic.Interfaces;
 using Domain.Models;
 using Domain.ValueTypes;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Dtos;
 
@@ -110,7 +109,7 @@ public class NoteController : ControllerBase
 
 private NoteResponse MapToNoteResponse(Note note)
     {
-        return new NoteResponse(note.Info.Title, note.Info.Created, note.Info.LastModified);
+        return new NoteResponse(note.Id, note.Info.Title, note.Info.Created, note.Info.LastModified);
     }
 
     private NoteContentResponse MapToNoteContentResponse(NoteContent noteContent)

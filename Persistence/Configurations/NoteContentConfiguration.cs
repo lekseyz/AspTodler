@@ -10,5 +10,7 @@ public class NoteContentConfiguration : IEntityTypeConfiguration<NoteContentEnti
     public void Configure(EntityTypeBuilder<NoteContentEntity> builder)
     {
         builder.HasIndex(n => n.Id);
+        builder.Property(c => c.Id).ValueGeneratedNever();
+
     }
 }

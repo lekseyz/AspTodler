@@ -3,6 +3,7 @@ namespace Persistence.DbEntities;
 public class NoteInfoEntity
 {
     public Guid Id { get; set; }
+    public NoteContentEntity? Content { get; set; }
     public string Title { get; set; }
     public Guid CreatorId { get; set; }
     public UserEntity Creator { get; set; }
