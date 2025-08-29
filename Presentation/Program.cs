@@ -1,3 +1,5 @@
+using Application.NoteLogic.Interfaces;
+using Application.NoteLogic.Services;
 using Application.UserLogic.Interfaces;
 using Application.UserLogic.Services;
 using Infrastructure;
@@ -9,8 +11,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddTestingDb(builder.Configuration);
 builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<NoteRepository>();
 builder.Services.AddScoped<RefreshTokenRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<INoteService, NoteService>();
 builder.Services.AddTransient<TokenService>();  
 builder.Services.AddTransient<PasswordService>();
 

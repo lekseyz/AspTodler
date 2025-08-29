@@ -3,7 +3,7 @@ using Application.UserLogic.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Dtos;
 
-namespace Presentation.Contorllers;
+namespace Presentation.Controllers;
 
 [ApiController]
 [Route("/api/auth")]

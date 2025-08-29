@@ -21,12 +21,9 @@ public class NoteRepository
         var userId = note.Info.CreatorId;
         
         //TODO: repos helpers with basic methods as get user by id
-        var userEntity = await _context.Users
-            .AsNoTracking()
-            .FirstOrDefaultAsync(user => user.Id == userId);
         
-        var info = MapFromInfo(note, userEntity!);
-        var content = MapFromContent(note, userEntity!);
+        var info = MapFromInfo(note, userId);
+        var content = MapFromContent(note);
         
         await _context.NoteInfos.AddAsync(info);
         await _context.NoteContents.AddAsync(content);
@@ -76,16 +73,19 @@ public class NoteRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteNote(Guid id)
+    public async Task<bool> DeleteNote(Guid id)
     {
         var infoAndContent = await JoinInfoAndContext(_context.NoteInfos, _context.NoteContents)
             .FirstOrDefaultAsync(s => s.NoteInfo.Id == id);
+        if (infoAndContent is null)
+            return false;
         
-        var (info, content) = infoAndContent!;
+        var (info, content) = infoAndContent;
         _context.NoteInfos.Remove(info);
         _context.NoteContents.Remove(content);
         
         await _context.SaveChangesAsync();
+        return true;
     }
 
     private IQueryable<InfoAndContent> JoinInfoAndContext(IQueryable<NoteInfoEntity> noteInfos, IQueryable<NoteContentEntity> noteContents)
@@ -108,7 +108,7 @@ public class NoteRepository
         return new NoteContent(entity.Content);
     }
 
-    private NoteInfoEntity MapFromInfo(Note note, UserEntity user)
+    private NoteInfoEntity MapFromInfo(Note note, Guid userId)
     {
         var info = note.Info;
         return new NoteInfoEntity()
@@ -116,12 +116,12 @@ public class NoteRepository
             Title = info.Title,
             Id = note.Id,
             Created = info.Created,
-            Creator = user,
+            CreatorId = userId,
             LastModified = info.LastModified
         };
     }
     
-    private NoteContentEntity MapFromContent(Note note, UserEntity user)
+    private NoteContentEntity MapFromContent(Note note)
     {
         var content = note.Content;
         return new NoteContentEntity()

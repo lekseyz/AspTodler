@@ -20,7 +20,7 @@ public class TokenService
     
     public string GenerateToken(User user)
     {
-        Claim[] claims = [new("id", user.Id.ToString()), new("email",  user.Email)];
+        Claim[] claims = [new(ClaimTypes.NameIdentifier, user.Id.ToString()), new(ClaimTypes.Email,  user.Email)];
         
         var signingCredentials = new SigningCredentials(
             key: new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.SecretKey)),

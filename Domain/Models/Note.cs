@@ -30,6 +30,19 @@ public class Note
         
     }
 
+    public void UpdateTitle(string title)
+    {
+        Info.Title = title;
+        Info.LastModified =  DateTime.UtcNow;
+    }
+
+    public void UpdateContent(string content)
+    {
+        if (Type != Types.Full) 
+            throw new InvalidNoteOperation("Trying update content type entity in partial note entity");
+        Content.Content = content;
+    }
+    
     private Note(Guid id, Types type, NoteInfo info, NoteContent? content = null)
     {
         Id = id;
@@ -38,12 +51,12 @@ public class Note
         _noteContent = content;
     }
 
-    public static Note Create(Guid id, NoteInfo info)
+    public static Note Create(NoteInfo info)
     {
         NoteContent content = new(String.Empty);
-        return new (Guid.NewGuid(), Types.InfoOnly, info, content);
+        return new (Guid.NewGuid(), Types.Full, info, content);
     }
-    public static Note Create(Guid id, NoteInfo info, NoteContent content)
+    public static Note Create(NoteInfo info, NoteContent content)
     {
         return new (Guid.NewGuid(), Types.InfoOnly, info, content);
     }

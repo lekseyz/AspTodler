@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Dtos;
 
-namespace Presentation.Contorllers;
+namespace Presentation.Controllers;
 
 [ApiController]
 [Route("/api/users")]
@@ -19,6 +19,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<List<UserResponse>>> GetUsers()
     {
